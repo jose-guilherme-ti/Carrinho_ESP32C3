@@ -3,8 +3,11 @@
 
 void ServoController::begin() {
     // Associa o pino a um PWM de 50 Hz com resolução de 16 bits.
-    ledcSetup(SERVO_CHANNEL, SERVO_FREQ, SERVO_RESOLUTION);
-    ledcAttachPin(SERVO_PIN, SERVO_CHANNEL);
+    ledcAttach(
+        SERVO_PIN,
+        SERVO_FREQ,
+        SERVO_RESOLUTION
+    );
 
     anguloAtual = 90.0f;
     anguloAlvo = 90.0f;

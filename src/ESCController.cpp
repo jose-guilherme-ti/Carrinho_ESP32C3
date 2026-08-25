@@ -3,8 +3,11 @@
 
 void ESCController::begin() {
     // O ESC recebe PWM semelhante ao de um servo RC: 50 Hz.
-    ledcSetup(ESC_CHANNEL, ESC_FREQ, ESC_RESOLUTION);
-    ledcAttachPin(ESC_PIN, ESC_CHANNEL);
+    ledcAttach(
+        ESC_PIN,
+        ESC_FREQ,
+        ESC_RESOLUTION
+    );
 
     velocidadeAtual = 0.0f;
     velocidadeAlvo = 0.0f;
