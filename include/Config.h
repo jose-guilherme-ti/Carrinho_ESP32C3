@@ -8,9 +8,17 @@
 // arquivos utilizam estas constantes para evitar valores
 // espalhados pelo código.
 
+
+// ========================================
+// CONFIGURAÇÃO DA REDE WI-FI
+// ========================================
+
+#define WIFI_SSID "Jose-Planet/3121433_2.4G"
+#define WIFI_PASSWORD "Guilherme1659"
+
 // ---------- Wi-Fi / UDP ----------
-#define WIFI_SSID       "Carrinho_G29"
-#define WIFI_PASSWORD   "12345678"
+//#define WIFI_SSID       "Carrinho_G29"
+//#define WIFI_PASSWORD   "12345678"
 #define UDP_PORT        4210
 
 // ---------- Pinos ----------

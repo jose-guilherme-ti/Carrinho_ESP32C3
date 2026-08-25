@@ -1,12 +1,10 @@
 #include <Arduino.h>
 #include "VehicleController.h"
-
 // =====================================================
 // ARQUIVO PRINCIPAL
 // =====================================================
 // Mantido propositalmente pequeno. Toda a lógica do
 // veículo está encapsulada em VehicleController.
-
 VehicleController vehicle;
 
 void setup() {
@@ -17,7 +15,6 @@ void setup() {
     Serial.println("================================");
     Serial.println(" CARRINHO G29 - ESP32-C3");
     Serial.println("================================");
-
     vehicle.begin();
 }
 
