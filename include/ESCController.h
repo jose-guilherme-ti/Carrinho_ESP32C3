@@ -15,7 +15,7 @@ private:
     float velocidadeAlvo = 0.0f;
 
     uint32_t microsecondsToDuty(int microseconds);
-
+    void writeMicroseconds(int microseconds);
 public:
     void begin();
     void setTarget(float velocidade);
@@ -25,3 +25,4 @@ public:
 };
 
 #endif
+

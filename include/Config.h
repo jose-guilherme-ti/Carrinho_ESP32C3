@@ -64,8 +64,13 @@
 #define ESC_FREQ          50
 #define ESC_RESOLUTION    14
 
-#define ESC_MIN_US        1000
-#define ESC_MAX_US        2000
+// Faixa padrão de controle RC
+#define ESC_REVERSE_US      1000
+#define ESC_NEUTRAL_US      1500
+#define ESC_FORWARD_US      2000
+
+// Pequena zona morta ao redor do neutro
+#define ESC_DEADZONE        3
 
 // ========================================
 // SEGURANÇA

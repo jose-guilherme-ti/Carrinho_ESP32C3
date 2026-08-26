@@ -1,61 +1,111 @@
 #include "ESCController.h"
 #include "Config.h"
 
-void ESCController::begin() {
-    // O ESC recebe PWM semelhante ao de um servo RC: 50 Hz.
-    ledcAttach(
+void ESCController::begin()
+{
+    Serial.println("[ESC] Inicializando...");
+
+    bool ok = ledcAttach(
         ESC_PIN,
         ESC_FREQ,
         ESC_RESOLUTION
     );
 
+    if (!ok) {
+        Serial.println("[ESC] ERRO: ledcAttach falhou!");
+        return;
+    }
+
     velocidadeAtual = 0.0f;
     velocidadeAlvo = 0.0f;
 
-    // Garante sinal mínimo/parado durante a inicialização.
-    update();
+    // ESC bidirecional:
+    // 1500 us representa a posição neutra.
+    writeMicroseconds(ESC_NEUTRAL_US);
 
-    Serial.println("ESC configurado em sinal minimo");
+    Serial.println("[ESC] Inicializado em NEUTRO");
 }
 
-uint32_t ESCController::microsecondsToDuty(int microseconds) {
-    const uint32_t periodoUs = 20000;
-    const uint32_t maxDuty = (1UL << ESC_RESOLUTION) - 1;
+uint32_t ESCController::microsecondsToDuty(
+    int microseconds
+)
+{
+    const uint32_t periodoUs =
+        1000000UL / ESC_FREQ;
 
-    return ((uint64_t)microseconds * maxDuty) / periodoUs;
+    const uint32_t maxDuty =
+        (1UL << ESC_RESOLUTION) - 1;
+
+    return (
+        (uint64_t)microseconds * maxDuty
+    ) / periodoUs;
 }
 
-// Define a velocidade desejada em porcentagem.
-void ESCController::setTarget(float velocidade) {
-    velocidadeAlvo = constrain(velocidade, 0.0f, 100.0f);
+void ESCController::writeMicroseconds(
+    int microseconds
+)
+{
+    microseconds = constrain(
+        microseconds,
+        ESC_REVERSE_US,
+        ESC_FORWARD_US
+    );
+
+    uint32_t duty =
+        microsecondsToDuty(microseconds);
+
+    ledcWrite(ESC_PIN, duty);
 }
 
-// Solicita parada. A desaceleração real ocorre em update().
-void ESCController::stop() {
+void ESCController::setTarget(float velocidade)
+{
+    velocidadeAlvo = constrain(
+        velocidade,
+        0.0f,
+        100.0f
+    );
+}
+
+void ESCController::stop()
+{
     velocidadeAlvo = 0.0f;
 }
 
-void ESCController::update() {
-    // Rampas independentes tornam a resposta mais suave.
-    const float subida = 1.5f;
-    const float descida = 4.0f;
+void ESCController::update()
+{
+    // Rampa inicial segura.
+    const float subida = 0.5f;
+    const float descida = 2.0f;
 
     if (velocidadeAtual < velocidadeAlvo) {
-        velocidadeAtual = min(velocidadeAtual + subida, velocidadeAlvo);
+
+        velocidadeAtual = min(
+            velocidadeAtual + subida,
+            velocidadeAlvo
+        );
+
     } else if (velocidadeAtual > velocidadeAlvo) {
-        velocidadeAtual = max(velocidadeAtual - descida, velocidadeAlvo);
+
+        velocidadeAtual = max(
+            velocidadeAtual - descida,
+            velocidadeAlvo
+        );
     }
 
+    // 0%   = 1500 us = neutro
+    // 100% = 2000 us = frente máxima
     int pulseUs = map(
         (int)velocidadeAtual,
-        0, 100,
-        ESC_MIN_US,
-        ESC_MAX_US
+        0,
+        100,
+        ESC_NEUTRAL_US,
+        ESC_FORWARD_US
     );
 
-    ledcWrite(ESC_PIN, microsecondsToDuty(pulseUs));
+    writeMicroseconds(pulseUs);
 }
 
-float ESCController::getSpeed() {
+float ESCController::getSpeed()
+{
     return velocidadeAtual;
 }

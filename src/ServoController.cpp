@@ -2,53 +2,89 @@
 #include "Config.h"
 
 void ServoController::begin() {
-    // Associa o pino a um PWM de 50 Hz com resolução de 16 bits.
-    ledcAttach(
-        SERVO_PIN,
-        SERVO_FREQ,
-        SERVO_RESOLUTION
-    );
 
-    anguloAtual = 90.0f;
-    anguloAlvo = 90.0f;
+  Serial.println("[SERVO] Configurando PWM...");
 
-    update();
+  bool ok = ledcAttach(
+    SERVO_PIN,
+    SERVO_FREQ,
+    SERVO_RESOLUTION);
+
+  Serial.print("[SERVO] GPIO: ");
+  Serial.println(SERVO_PIN);
+
+  Serial.print("[SERVO] Frequencia: ");
+  Serial.println(SERVO_FREQ);
+
+  Serial.print("[SERVO] Resolucao: ");
+  Serial.println(SERVO_RESOLUTION);
+
+  Serial.print("[SERVO] Attach: ");
+  Serial.println(ok ? "OK" : "FALHOU");
+
+  if (!ok) {
+    return;
+  }
+
+  anguloAtual = 90.0f;
+  anguloAlvo = 90.0f;
+
+  uint32_t duty = microsecondsToDuty(1500);
+
+  Serial.print("[SERVO] Duty 1500us: ");
+  Serial.println(duty);
+
+  ledcWrite(SERVO_PIN, duty);
 }
-
 // Em 50 Hz, um período completo possui 20.000 us.
 uint32_t ServoController::microsecondsToDuty(int microseconds) {
-    const uint32_t periodoUs = 20000;
-    const uint32_t maxDuty = (1UL << SERVO_RESOLUTION) - 1;
+  const uint32_t periodoUs = 20000;
+  const uint32_t maxDuty = (1UL << SERVO_RESOLUTION) - 1;
 
-    return ((uint64_t)microseconds * maxDuty) / periodoUs;
+  return ((uint64_t)microseconds * maxDuty) / periodoUs;
 }
 
 // Define o novo ângulo desejado. O movimento físico é
 // realizado gradualmente dentro de update().
 void ServoController::setTarget(float angulo) {
-    anguloAlvo = constrain(angulo, 0.0f, 180.0f);
+  anguloAlvo = constrain(angulo, 0.0f, 180.0f);
 }
 
 void ServoController::update() {
-    // Suavização da direção para evitar movimentos bruscos.
-    const float velocidade = 2.5f;
+  const float velocidade = 2.5f;
 
-    if (anguloAtual < anguloAlvo) {
-        anguloAtual = min(anguloAtual + velocidade, anguloAlvo);
-    } else if (anguloAtual > anguloAlvo) {
-        anguloAtual = max(anguloAtual - velocidade, anguloAlvo);
-    }
+  if (anguloAtual < anguloAlvo) {
+    anguloAtual = min(anguloAtual + velocidade, anguloAlvo);
+  } else if (anguloAtual > anguloAlvo) {
+    anguloAtual = max(anguloAtual - velocidade, anguloAlvo);
+  }
 
-    int pulseUs = map(
-        (int)anguloAtual,
-        0, 180,
-        SERVO_MIN_US,
-        SERVO_MAX_US
-    );
+  int pulseUs = map(
+    (int)anguloAtual,
+    0, 180,
+    SERVO_MAX_US,
+    SERVO_MIN_US);
 
-    ledcWrite(SERVO_PIN, microsecondsToDuty(pulseUs));
+  uint32_t duty = microsecondsToDuty(pulseUs);
+
+  ledcWrite(SERVO_PIN, duty);
+
+  static unsigned long ultimoTeste = 0;
+
+  if (millis() - ultimoTeste >= 500) {
+    ultimoTeste = millis();
+
+    Serial.print("[SERVO] Angulo=");
+    Serial.print(anguloAtual, 1);
+
+    Serial.print(" | Pulse=");
+    Serial.print(pulseUs);
+
+    Serial.print("us | Duty=");
+    Serial.println(duty);
+  }
 }
 
 float ServoController::getAngle() {
-    return anguloAtual;
+  return anguloAtual;
 }
