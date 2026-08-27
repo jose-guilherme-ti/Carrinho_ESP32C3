@@ -15,6 +15,15 @@
 #define WIFI_SSID     "Jose-Planet/3121433_2.4G"
 #define WIFI_PASSWORD "Guilherme1659"
 
+// ---------- IP ESTÁTICO ----------
+
+// Ajuste estes valores conforme a sua rede.
+#define WIFI_STATIC_IP   IPAddress(192, 168, 0, 108)
+#define WIFI_GATEWAY     IPAddress(192, 168, 0, 1)
+#define WIFI_SUBNET      IPAddress(255, 255, 255, 0)
+#define WIFI_DNS1        IPAddress(192, 168, 0, 1)
+#define WIFI_DNS2        IPAddress(8, 8, 8, 8)
+
 // ---------- Wi-Fi / UDP ----------
 
 #define UDP_PORT      4210
@@ -49,6 +58,16 @@
 
 #define SERVO_MIN_US      500
 #define SERVO_MAX_US      2400
+
+
+// Ajuste fino do centro da direção.
+// Valor positivo ou negativo em graus.
+
+#define SERVO_CENTER_OFFSET -13
+
+// true = inverte o sentido da direção
+
+#define SERVO_INVERTIDO     true
 
 // ========================================
 // ESC

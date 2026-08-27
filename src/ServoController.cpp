@@ -51,38 +51,59 @@ void ServoController::setTarget(float angulo) {
 }
 
 void ServoController::update() {
-  const float velocidade = 2.5f;
+    const float velocidade = 2.5f;
 
-  if (anguloAtual < anguloAlvo) {
-    anguloAtual = min(anguloAtual + velocidade, anguloAlvo);
-  } else if (anguloAtual > anguloAlvo) {
-    anguloAtual = max(anguloAtual - velocidade, anguloAlvo);
-  }
+    if (anguloAtual < anguloAlvo) {
+        anguloAtual = min(
+            anguloAtual + velocidade,
+            anguloAlvo
+        );
+    }
+    else if (anguloAtual > anguloAlvo) {
+        anguloAtual = max(
+            anguloAtual - velocidade,
+            anguloAlvo
+        );
+    }
 
-  int pulseUs = map(
-    (int)anguloAtual,
-    0, 180,
-    SERVO_MAX_US,
-    SERVO_MIN_US);
+    // Aplica ajuste fino para centralização mecânica.
+    float anguloCorrigido =
+        anguloAtual + SERVO_CENTER_OFFSET;
 
-  uint32_t duty = microsecondsToDuty(pulseUs);
+    // Garante que o valor continue dentro do limite.
+    anguloCorrigido = constrain(
+        anguloCorrigido,
+        0.0f,
+        180.0f
+    );
 
-  ledcWrite(SERVO_PIN, duty);
+    int pulseUs;
 
-  static unsigned long ultimoTeste = 0;
+    if (SERVO_INVERTIDO) {
 
-  if (millis() - ultimoTeste >= 500) {
-    ultimoTeste = millis();
+        pulseUs = map(
+            (int)anguloCorrigido,
+            0,
+            180,
+            SERVO_MAX_US,
+            SERVO_MIN_US
+        );
 
-    Serial.print("[SERVO] Angulo=");
-    Serial.print(anguloAtual, 1);
+    } else {
 
-    Serial.print(" | Pulse=");
-    Serial.print(pulseUs);
+        pulseUs = map(
+            (int)anguloCorrigido,
+            0,
+            180,
+            SERVO_MIN_US,
+            SERVO_MAX_US
+        );
+    }
 
-    Serial.print("us | Duty=");
-    Serial.println(duty);
-  }
+    ledcWrite(
+        SERVO_PIN,
+        microsecondsToDuty(pulseUs)
+    );
 }
 
 float ServoController::getAngle() {
