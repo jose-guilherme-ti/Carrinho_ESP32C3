@@ -257,56 +257,6 @@ void G29NetworkManager::update()
         
     }
 
-    /* // Finaliza a string recebida.
-    packetBuffer[len] = '\0'; */
-
-    // =================================================
-    // DECODIFICA O PACOTE
-    // =================================================
-
-    int s;
-    int a;
-    int f;
-    int r;
-
-    int resultado = sscanf(
-        packetBuffer,
-        "S:%d,A:%d,F:%d,R:%d",
-        &s,
-        &a,
-        &f,
-        &r);
-
-    // Ignora pacotes inválidos.
-    if (resultado != 3)
-    {
-
-        Serial.print("Pacote invalido: ");
-        Serial.println(packetBuffer);
-
-        return;
-    }
-
-    // =================================================
-    // ATUALIZA OS COMANDOS
-    // =================================================
-
-    direcao = constrain(s, 0, 180);
-
-    acelerador = constrain(
-        a,
-        0,
-        100);
-
-    freio = constrain(
-        f,
-        0,
-        100);
-
-    re = constrain(r, 0, 1);
-
-    // Registra o momento do último pacote válido.
-    ultimoPacote = millis();
 }
 
 // =====================================================

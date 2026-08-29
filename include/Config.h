@@ -28,6 +28,15 @@
 
 #define UDP_PORT      4210
 
+// ---------- Controle pelo celular ----------
+// Porta do servidor web. A porta 80 permite acessar
+// somente pelo IP, por exemplo: http://192.168.0.108
+#define MOBILE_HTTP_PORT      80
+
+// Tempo máximo sem comandos do navegador antes de
+// devolver o controle ao G29/failsafe.
+#define TEMPO_MOBILE_FAILSAFE 500
+
 // ========================================
 // PINOS
 // ========================================

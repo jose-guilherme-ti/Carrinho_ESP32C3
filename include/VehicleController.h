@@ -5,6 +5,7 @@
 #include "ServoController.h"
 #include "ESCController.h"
 #include "MPUController.h"
+#include "MobileController.h"
 
 // =====================================================
 // VehicleController
@@ -21,6 +22,7 @@ private:
     ServoController servo;
     ESCController esc;
     MPUController mpu;
+    MobileController mobile;
 
 public:
     void begin();
